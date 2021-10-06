@@ -1,0 +1,134 @@
+// Copyright (c) 2019, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'dart:async';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  final String title;
+
+  const MyHomePage({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final myora = TextEditingController();
+  final myperc = TextEditingController();
+  final mymasodp = TextEditingController();
+
+  bool _isRunning = false;
+  String szoveg = "";
+  String tuloraig = "";
+  void _incrementCounter() {
+    setState(() {
+      !_isRunning;
+    });
+  }
+
+  void _addItem() {
+    final endtime = DateTime(2021, 9, 16, int.parse(myora.text) + 8,
+        int.parse(myperc.text) + 40, int.parse(mymasodp.text));
+    final overtime = DateTime(2021, 9, 16, int.parse(myora.text) + 9,
+        int.parse(myperc.text), int.parse(mymasodp.text));
+    final DateTime now = DateTime.now();
+
+    if (myora.text.isNotEmpty &&
+        myperc.text.isNotEmpty &&
+        mymasodp.text.isNotEmpty) {
+      setState(() {
+        szoveg = now.difference(endtime).abs().toString();
+        tuloraig = now.difference(overtime).abs().toString();
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    _isRunning = true;
+    Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      if (!_isRunning) {
+        timer.cancel();
+      }
+      _addItem();
+    });
+    super.initState();
+  }
+
+  DateTime now = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Column(
+        children: [
+          Text('Beérkezés ideje'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Flexible(
+                child: TextField(
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'Ora:'),
+                  controller: myora,
+                ),
+              ),
+              SizedBox(
+                width: 20.0,
+              ),
+              Flexible(
+                child: TextField(
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'Perc'),
+                  controller: myperc,
+                ),
+              ),
+              SizedBox(
+                width: 20.0,
+              ),
+              Flexible(
+                child: TextField(
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'Masodperc'),
+                  controller: mymasodp,
+                ),
+              ),
+            ],
+          ),
+          Text('munka vége: $szoveg'),
+          Text('túlórági vissza: $tuloraig'),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
