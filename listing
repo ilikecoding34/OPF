@@ -1,0 +1,71 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final appTitle = 'Opacity Demo';
+    return MaterialApp(
+      title: appTitle,
+      home: MyHomePage(title: appTitle),
+    );
+  }
+}
+
+// The StatefulWidget's job is to take data and create a State class.
+// In this case, the widget takes a title, and creates a _MyHomePageState.
+class MyHomePage extends StatefulWidget {
+  final String title;
+
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+var list = [
+    {
+      'name':'Dav',
+      'numbers': ['1', '2', '3'],
+    },
+    {
+      'name':'Tim',
+      'numbers': ['4', '5', '6'],
+    },
+    {
+      'name':'Emm',
+      'numbers': ['7', '8', '9'],
+    },
+  ];
+
+var counter = 0;
+
+// The State class is responsible for two things: holding some data you can
+// update and building the UI using that data.
+class _MyHomePageState extends State<MyHomePage> {
+  // Whether the green box should be visible
+ // bool _visible = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('title'),
+        ),
+        body:Column(children: [
+        Text(list[counter]['name'].toString()),
+        ...(list[counter]['numbers'] as List<String>).map((valasz){
+          return TextButton( onPressed: () {
+            setState(() {
+            counter++;
+            });
+         
+         }, child: Text(valasz));
+        }),
+        ],),
+      ),
+    );
+  }
+}
