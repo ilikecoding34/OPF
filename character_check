@@ -1,0 +1,15 @@
+void main() {
+  var lista = ['elso 111', 'masodik 12', 'harmadik 34'];
+  print(lista);
+  for (int i = 0; i < lista.length; i++) {
+    // print(lista[i]);
+    for (int j = 0; j < lista[i].length; j++) {
+      if (int.tryParse(lista[i][j]) != null) {
+        //
+        var elso = lista[i].indexOf(lista[i][j]);
+        print(lista[i].substring(elso, lista[i].length));
+        break;
+      }
+    }
+  }
+}
