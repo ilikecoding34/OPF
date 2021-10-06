@@ -1,0 +1,131 @@
+// Copyright (c) 2019, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  final String title;
+
+  const MyHomePage({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  bool odavissza = true;
+
+  List<Student> students = [];
+
+  void _order(int index) {
+    odavissza = !odavissza;
+    students.clear();
+    setState(() {
+      for (int i = 0; i < lista.length; i++) {
+        students.add(Student(id: lista[i][0], datum:lista[i][1]));
+      }
+      if(index == 1){
+        if (odavissza) {
+        students.sort((a, b) => a.datum.compareTo(b.datum));
+      } else {
+        students.sort((a, b) => b.datum.compareTo(a.datum));
+      }
+      }else{
+         if (odavissza) {
+        students.sort((a, b) => a.id.compareTo(b.id));
+      } else {
+        students.sort((a, b) => b.id.compareTo(a.id));
+      }
+      }
+      
+    });
+ 
+  }
+
+  var lista = [
+    ["1", "2019-11-21 00:00:00.000"],
+    ["2", "2019-11-21 00:00:00.000"],
+    ["3", "2019-11-25 00:00:00.000"],
+    ["4", "2019-11-22 00:00:00.000"],
+    ["5", "2019-11-23 00:00:00.000"]
+  ];
+
+  DateFormat format = DateFormat("yyyy-MM-dd");
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Column(
+        children: [
+          Row(children: [
+            ElevatedButton(
+              onPressed: () => _order(0),
+              child: const Text('id'),
+            ),
+            ElevatedButton(
+              onPressed: () => _order(1),
+              child: const Text('date'),
+            ),
+          ]),
+          Expanded(
+            child: ListView.builder(
+              itemCount: lista.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Row(children: [
+                    students.isNotEmpty
+                        ? Text(students[index].id.toString())
+                        : Text(''),
+                    Text(' - '),
+                    students.isNotEmpty
+                        ? Text(students[index].datum.toString())
+                        : Text(''),
+                  ]),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Student{
+  String id;
+  String datum;
+
+  Student({
+    required this.id,
+    required this.datum,
+ });
+  
+  @override
+  String toString() {
+    return 'Student: {id: $id, datum: $datum}';
+  }
+}
