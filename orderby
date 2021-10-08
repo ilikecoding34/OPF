@@ -38,6 +38,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   List<Student> students = [];
 
+  final myController = TextEditingController();
+
   void _order(int index) {
     ascdesc = !ascdesc;
     students.clear();
@@ -61,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
   }
-
+ 
   searchf(List<Student> replacelist) {
     for (int i = 0; i < replacelist.length; i++) {
       replacelist[i].id = replacelist[i].id.replaceAll(RegExp(r"\D"), "");
@@ -74,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ["b21d", "2019-11-21 00:00:00.000"],
     ["c32f", "2019-11-25 00:00:00.000"],
     ["d44f", "2019-11-22 00:00:00.000"],
-    ["e57d", "2019-11-23 00:00:00.000"]
+    ["e54d", "2019-11-23 00:00:00.000"]
   ];
 
   DateFormat format = DateFormat("yyyy-MM-dd");
@@ -97,22 +99,39 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () => _order(1),
               child: const Text('date'),
             ),
+            
+            Text('Search: '),
+            Flexible(
+                child: Container(
+                    width: 100.0,
+                    child: TextField(
+                      controller: myController,
+                      onChanged: (text) {
+                        setState(() {});
+                      },
+                    ))),
+            ElevatedButton(
+              onPressed: () => setState(() {myController.clear();}),
+              child: const Text('Search clear'),
+            ),
+          
           ]),
           Expanded(
             child: ListView.builder(
               itemCount: list.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Row(children: [
-                    students.isNotEmpty
-                        ? Text(students[index].id.toString())
-                        : Text(''),
-                    students.isNotEmpty ? Text(' - ') : Text(''),
-                    students.isNotEmpty
-                        ? Text(students[index].datum.toString())
-                        : Text(''),
-                  ]),
-                );
+                if (students.isNotEmpty &&
+                    students[index].id.contains(myController.text)) {
+                  return ListTile(
+                    title: Row(children: [
+                      Text(students[index].id),
+                      Text(' - '),
+                      Text(students[index].datum),
+                    ]),
+                  );
+                } else {
+                  return SizedBox.shrink();
+                }
               },
             ),
           ),
