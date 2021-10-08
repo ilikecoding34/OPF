@@ -34,41 +34,47 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  bool odavissza = true;
+  bool ascdesc = true;
 
   List<Student> students = [];
 
   void _order(int index) {
-    odavissza = !odavissza;
+    ascdesc = !ascdesc;
     students.clear();
     setState(() {
-      for (int i = 0; i < lista.length; i++) {
-        students.add(Student(id: lista[i][0], datum:lista[i][1]));
+      for (int i = 0; i < list.length; i++) {
+        students.add(Student(id: list[i][0], datum: list[i][1]));
       }
-      if(index == 1){
-        if (odavissza) {
-        students.sort((a, b) => a.datum.compareTo(b.datum));
+      students = searchf(students);
+      if (index == 1) {
+        if (ascdesc) {
+          students.sort((a, b) => a.datum.compareTo(b.datum));
+        } else {
+          students.sort((a, b) => b.datum.compareTo(a.datum));
+        }
       } else {
-        students.sort((a, b) => b.datum.compareTo(a.datum));
+        if (ascdesc) {
+          students.sort((a, b) => a.id.compareTo(b.id));
+        } else {
+          students.sort((a, b) => b.id.compareTo(a.id));
+        }
       }
-      }else{
-         if (odavissza) {
-        students.sort((a, b) => a.id.compareTo(b.id));
-      } else {
-        students.sort((a, b) => b.id.compareTo(a.id));
-      }
-      }
-      
     });
- 
   }
 
-  var lista = [
-    ["1", "2019-11-21 00:00:00.000"],
-    ["2", "2019-11-21 00:00:00.000"],
-    ["3", "2019-11-25 00:00:00.000"],
-    ["4", "2019-11-22 00:00:00.000"],
-    ["5", "2019-11-23 00:00:00.000"]
+  searchf(List<Student> replacelist) {
+    for (int i = 0; i < replacelist.length; i++) {
+      replacelist[i].id = replacelist[i].id.replaceAll(RegExp(r"\D"), "");
+    }
+    return replacelist;
+  }
+
+  var list = [
+    ["a10a", "2019-11-21 00:00:00.000"],
+    ["b21d", "2019-11-21 00:00:00.000"],
+    ["c32f", "2019-11-25 00:00:00.000"],
+    ["d44f", "2019-11-22 00:00:00.000"],
+    ["e57d", "2019-11-23 00:00:00.000"]
   ];
 
   DateFormat format = DateFormat("yyyy-MM-dd");
@@ -82,6 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         children: [
           Row(children: [
+            Text('Order by: '),
             ElevatedButton(
               onPressed: () => _order(0),
               child: const Text('id'),
@@ -93,14 +100,14 @@ class _MyHomePageState extends State<MyHomePage> {
           ]),
           Expanded(
             child: ListView.builder(
-              itemCount: lista.length,
+              itemCount: list.length,
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Row(children: [
                     students.isNotEmpty
                         ? Text(students[index].id.toString())
                         : Text(''),
-                    Text(' - '),
+                    students.isNotEmpty ? Text(' - ') : Text(''),
                     students.isNotEmpty
                         ? Text(students[index].datum.toString())
                         : Text(''),
@@ -115,15 +122,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class Student{
+class Student {
   String id;
   String datum;
 
   Student({
     required this.id,
     required this.datum,
- });
-  
+  });
+
   @override
   String toString() {
     return 'Student: {id: $id, datum: $datum}';
