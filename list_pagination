@@ -1,0 +1,100 @@
+// Copyright (c) 2019, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  final String title;
+
+  const MyHomePage({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+  int fromto = 0;
+  List<String> visible = [];
+  final List<String> items = List<String>.generate(100, (i) => 'Item $i');
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+  loadlist(int range){
+    visible = items.getRange(range-10, range).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Column(children: [
+        Row(
+          
+          children: [
+          fromto > 10 ? ElevatedButton(
+          onPressed: () {
+            setState(() {
+              visible.clear();
+              fromto = fromto - 10;
+          /*    for (int i = fromto - 10; i < fromto; i++) {
+                visible.add(items[i]);
+              }*/
+              loadlist(fromto);
+            });
+          },
+          child: const Text('prev'),
+        ) : Container(),
+        fromto < 20 ? SizedBox(width: 70) : SizedBox(width: 10),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              visible.clear();
+              fromto = fromto + 10;
+            /*  for (int i = fromto - 10; i < fromto; i++) {
+                visible.add(items[i]);
+              }*/
+              loadlist(fromto);
+            });
+          },
+          child: const Text('next'),
+        ),
+        ]),
+        
+        Expanded(
+            child: ListView.builder(
+          itemCount: visible.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(visible[index]),
+            );
+          },
+        )),
+      ]),
+    );
+  }
+}
