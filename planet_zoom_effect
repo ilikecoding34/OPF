@@ -1,0 +1,176 @@
+// Copyright 2019 the Dart project authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license
+// that can be found in the LICENSE file.
+
+import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import 'dart:async';
+
+final Color primaryColor = Colors.orange;
+const TargetPlatform platform = TargetPlatform.android;
+
+void main() {
+  runApp(Sunflower());
+}
+
+class SunflowerPainter extends CustomPainter {
+  int scaleFactor = 4;
+  static const tau = math.pi * 2;
+
+  static final phi = (math.sqrt(5) + 1) / 2;
+
+  int seeds;
+  var seedRadius;
+  SunflowerPainter(this.seeds);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if ((2.0 * (seeds / 40)) > 1) {
+      seedRadius = 2.0 * (seeds / 20);
+    } else {
+      seedRadius = 2.0;
+    }
+    scaleFactor = (3 * seeds).floor();
+    final center = 350;
+    int planets = 0;
+    planets = (seeds < 400) ? seeds : 1;
+
+    for (var i = 0; i < (400 - planets); i++) {
+      final theta = i * tau / phi;
+      final r = math.sqrt(i) * scaleFactor;
+      final x = center + r * math.cos(theta);
+      final y = center - 150 - r * math.sin(theta);
+      final offset = Offset(x, y);
+      if (!size.contains(offset)) {
+        continue;
+      }
+      drawSeed(canvas, x, y);
+    }
+  }
+
+  @override
+  bool shouldRepaint(SunflowerPainter oldDelegate) {
+    return oldDelegate.seeds != seeds;
+  }
+
+  // Draw a small circle representing a seed centered at (x,y).
+  void drawSeed(Canvas canvas, double x, double y) {
+    final paint = Paint()
+      ..strokeWidth = 2
+      ..style = PaintingStyle.fill
+      ..color = primaryColor;
+    canvas.drawCircle(Offset(x, y), seedRadius, paint);
+  }
+}
+
+class Sunflower extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _SunflowerState();
+  }
+}
+
+class _SunflowerState extends State<Sunflower> {
+  double seeds = 10.0;
+
+  int get seedCount => seeds.floor();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData().copyWith(
+        platform: platform,
+        brightness: Brightness.dark,
+        sliderTheme: SliderThemeData.fromPrimaryColors(
+          primaryColor: primaryColor,
+          primaryColorLight: primaryColor,
+          primaryColorDark: primaryColor,
+          valueIndicatorTextStyle: const DefaultTextStyle.fallback().style,
+        ),
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text("Planets"),
+        ),
+        drawer: Drawer(
+          child: ListView(
+            children: const [
+              DrawerHeader(
+                child: Center(
+                  child: Text(
+                    "Sunflower 🌻",
+                    style: TextStyle(fontSize: 32),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        body: Container(
+          constraints: const BoxConstraints.expand(),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.transparent,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.transparent,
+                  ),
+                ),
+                child: SizedBox(
+                  width: 800,
+                  height: 400,
+                  child: CustomPaint(
+                    painter: SunflowerPainter(seedCount),
+                  ),
+                ),
+              ),
+              Text("Zoom $seedCount x"),
+              ElevatedButton(
+                child: Text("Auto zoom"),
+                onPressed: () {
+                  seeds = 10;
+                  const oneSec = Duration(milliseconds: 100);
+                  Timer.periodic(
+                      oneSec,
+                      (Timer t) => setState(() {
+                            seeds++;
+                        if (seeds > 200){
+                          t.cancel();
+                          
+                        } 
+                          }));
+                },
+              ),
+              /*     ConstrainedBox(
+                constraints: const BoxConstraints.tightFor(width: 300),
+                child: Slider.adaptive(
+                  min: 10,
+                  max: 500,
+                  value: seeds,
+                  onChanged: (newValue) {
+                    setState(() {
+                      seeds = newValue;
+                    });
+                  },
+                ),
+              ),*/
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
