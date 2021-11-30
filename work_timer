@@ -1,6 +1,3 @@
-// Copyright (c) 2019, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -47,11 +44,13 @@ class _MyHomePageState extends State<MyHomePage> {
       !_isRunning;
     });
   }
+  
+  DateTime today = DateTime.now();
 
   void _addItem() {
-    final endtime = DateTime(2021, 9, 16, int.parse(myora.text) + 8,
+    final endtime = DateTime(today.year, today.month, today.day, int.parse(myora.text) + 8,
         int.parse(myperc.text) + 40, int.parse(mymasodp.text));
-    final overtime = DateTime(2021, 9, 16, int.parse(myora.text) + 9,
+    final overtime = DateTime(today.year, today.month, today.day, int.parse(myora.text) + 9,
         int.parse(myperc.text), int.parse(mymasodp.text));
     final DateTime now = DateTime.now();
 
@@ -121,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Text('munka vége: $szoveg'),
-          Text('túlórági vissza: $tuloraig'),
+          Text('túlóráig vissza: $tuloraig'),
         ],
       ),
       floatingActionButton: FloatingActionButton(
