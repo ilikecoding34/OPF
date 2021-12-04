@@ -31,16 +31,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
-  final myora = TextEditingController();
-  final myperc = TextEditingController();
-  final mymasodp = TextEditingController();
+  final arrivehour = TextEditingController();
+  final arrivemin = TextEditingController();
+  final arrivesec = TextEditingController();
 
   bool _isRunning = false;
   int hour = 0;
   int min = 0;
   int sec = 0;
-  String szoveg = "";
-  String tuloraig = "";
+  String overtimetext = "";
   void _incrementCounter() {
     setState(() {
       !_isRunning;
@@ -54,36 +53,32 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         today.year,
         today.month,
         today.day,
-        int.parse(myora.text) + 8,
-        int.parse(myperc.text) + 40,
-        int.parse(mymasodp.text));
+        int.parse(arrivehour.text) + 8,
+        int.parse(arrivemin.text) + 40,
+        int.parse(arrivesec.text));
     final overtime = DateTime(
         today.year,
         today.month,
         today.day,
-        int.parse(myora.text) + 9,
-        int.parse(myperc.text),
-        int.parse(mymasodp.text));
+        int.parse(arrivehour.text) + 9,
+        int.parse(arrivemin.text),
+        int.parse(arrivesec.text));
     final DateTime now = DateTime.now();
 
-    if (myora.text.isNotEmpty &&
-        myperc.text.isNotEmpty &&
-        mymasodp.text.isNotEmpty) {
+    if (arrivehour.text.isNotEmpty &&
+        arrivemin.text.isNotEmpty &&
+        arrivesec.text.isNotEmpty) {
       setState(() {
-        szoveg = now.difference(endtime).abs().toString();
         hour = now.difference(endtime).inHours.abs() % 24;
         min = now.difference(endtime).inMinutes.abs() % 60;
         sec = now.difference(endtime).inSeconds.abs() % 60;
-        tuloraig = now.difference(overtime).abs().toString();
+        overtimetext = now.difference(overtime).abs().toString();
       });
     }
   }
 
   @override
   void initState() {
-     myora.text = "7";
-   myperc.text = "12";
-   mymasodp.text = "2";
     _isRunning = true;
     Timer.periodic(Duration(seconds: 1), (Timer timer) {
       if (!_isRunning) {
@@ -104,15 +99,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       ),
       body: Column(
         children: [
-          Text('Beérkezés ideje'),
+          Text('Arrive time'),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+               SizedBox(
+                width: 20.0,
+              ),
               Flexible(
                 child: TextField(
                   decoration: const InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Ora:'),
-                  controller: myora,
+                      border: OutlineInputBorder(), hintText: 'Hour'),
+                  controller: arrivehour,
                 ),
               ),
               SizedBox(
@@ -121,8 +119,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
               Flexible(
                 child: TextField(
                   decoration: const InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Perc'),
-                  controller: myperc,
+                      border: OutlineInputBorder(), hintText: 'Minute'),
+                  controller: arrivemin,
                 ),
               ),
               SizedBox(
@@ -131,9 +129,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
               Flexible(
                 child: TextField(
                   decoration: const InputDecoration(
-                      border: OutlineInputBorder(), hintText: 'Masodperc'),
-                  controller: mymasodp,
+                      border: OutlineInputBorder(), hintText: 'Second'),
+                  controller: arrivesec,
                 ),
+              ),
+               SizedBox(
+                width: 20.0,
               ),
             ],
           ),
@@ -144,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 return ScaleTransition(child: child, scale: animation);
               },
               child: Text(
-                '$hour : ',
+                '$hour',
                 // This key causes the AnimatedSwitcher to interpret this as a "new"
                 // child each time the count changes, so that it will begin its animation
                 // when the count changes.
@@ -152,13 +153,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 style: Theme.of(context).textTheme.headline4,
               ),
             ),
+            Text(' : '),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 500),
               transitionBuilder: (Widget child, Animation<double> animation) {
                 return ScaleTransition(child: child, scale: animation);
               },
               child: Text(
-                '$min : ',
+                '$min',
                 // This key causes the AnimatedSwitcher to interpret this as a "new"
                 // child each time the count changes, so that it will begin its animation
                 // when the count changes.
@@ -166,23 +168,39 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 style: Theme.of(context).textTheme.headline4,
               ),
             ),
+            Text(' : '),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 500),
-              transitionBuilder: (Widget child, Animation<double> animation) {
-              // 1.
-  final offsetAnimation = Tween(
-    begin: const Offset(0.0, 1.0),
-    end: const Offset(0.0, 0.0),
-  ).animate(animation);
-  // 3.
-  return ClipRect(
-    // 2.
-    child: SlideTransition(
-      position: offsetAnimation,
-      child: child,
-    ),
-  );
-},
+            transitionBuilder: (Widget child, Animation<double> animation) {
+                final inAnimation =
+                Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset(0.0, 0.0))
+                    .animate(animation);
+            final outAnimation =
+                Tween<Offset>(begin: Offset(0.0, -1.0), end: Offset(0.0, 0.0))
+                    .animate(animation);
+
+            if (child.key == ValueKey(sec)) {
+              return ClipRect(
+                child: SlideTransition(
+                  position: inAnimation,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: child,
+                  ),
+                ),
+              );
+            } else {
+              return ClipRect(
+                child: SlideTransition(
+                  position: outAnimation,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: child,
+                  ),
+                ),
+              );
+            }
+              },
               child: Text(
                 '$sec',
                 // This key causes the AnimatedSwitcher to interpret this as a "new"
@@ -193,15 +211,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
               ),
             ),
           ]),
-          //   Text('munka vége: $szoveg'),
-          Text('túlóráig vissza: $tuloraig'),
+          Text('until overtime: $overtimetext'),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+     
     );
   }
 }
