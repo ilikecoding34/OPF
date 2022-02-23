@@ -1,0 +1,108 @@
+// Copyright (c) 2019, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  final String title;
+
+  const MyHomePage({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  num number = 0.0;
+  double max = 50;
+  double min = 0.0;
+  double maxvalue = 100.0;
+  double value = 0;
+  var rnd = Random();
+  List<num> lista = [];
+
+  final myc1 = TextEditingController();
+  final myc2 = TextEditingController();
+
+  void calc() {
+    for (double i = min; i < max; i++) {
+      double half = 30;
+      number = pow((i / (max - (half + i))) * 2, 2);
+      lista.add(number);
+      print(number);
+    }
+    setState(() {});
+  }
+  
+  void randomgen(double inmin, double inmax) {
+    double half = inmin + (inmax - inmin) / 2;
+    double sum = 0;
+    List<double> avglist = [];
+    for(int i = 0; i < 100; i++){
+      avglist.add(doubleInRange(rnd, inmin,inmax));
+    }
+    for (var i = 0; i < avglist.length; i++) {
+    sum += avglist[i];
+    }
+    value = sum/avglist.length;
+    setState(() {});
+  }
+  
+  double doubleInRange(Random source, num start, num end){
+    return start + (source.nextDouble() * (end-start));
+  }
+    
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('$value'),
+      ),
+      body: Column(
+        children: [
+          Row(children: [
+            Container(
+              padding: EdgeInsets.all(10),
+                width: 100,
+                child: TextField(
+                  controller: myc1,
+                )),
+            Container(
+                width: 100,
+                child: TextField(
+                  controller: myc2,
+                ))
+          ]),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () =>
+            randomgen(double.parse(myc1.text), double.parse(myc2.text)),
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
