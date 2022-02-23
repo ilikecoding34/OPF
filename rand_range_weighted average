@@ -54,25 +54,25 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     setState(() {});
   }
-  
+
   void randomgen(double inmin, double inmax) {
     double half = inmin + (inmax - inmin) / 2;
     double sum = 0;
     List<double> avglist = [];
-    for(int i = 0; i < 100; i++){
-      avglist.add(doubleInRange(rnd, inmin,inmax));
+    for (int i = 0; i < 100; i++) {
+      avglist.add(doubleInRange(rnd, inmin, inmax));
     }
     for (var i = 0; i < avglist.length; i++) {
-    sum += avglist[i];
+      sum += avglist[i];
     }
-    value = sum/avglist.length;
+    value = sum / avglist.length;
+    lista.add(value);
     setState(() {});
   }
-  
-  double doubleInRange(Random source, num start, num end){
-    return start + (source.nextDouble() * (end-start));
+
+  double doubleInRange(Random source, num start, num end) {
+    return start + (source.nextDouble() * (end - start));
   }
-    
 
   @override
   Widget build(BuildContext context) {
@@ -80,11 +80,19 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('$value'),
       ),
-      body: Column(
+      body: 
+      
+      Stack(children: [
+            for(int i = 0; i< lista.length; i++)
+            Positioned(
+                top: lista[i].toDouble()*2,
+                left: 100,
+                child: (Container(color: Colors.black, width: 10, height: 10))),
+          Column(
         children: [
           Row(children: [
             Container(
-              padding: EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
                 width: 100,
                 child: TextField(
                   controller: myc1,
@@ -95,8 +103,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   controller: myc2,
                 ))
           ]),
+          
         ],
-      ),
+      ),]),
+      
       floatingActionButton: FloatingActionButton(
         onPressed: () =>
             randomgen(double.parse(myc1.text), double.parse(myc2.text)),
