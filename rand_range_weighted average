@@ -35,43 +35,54 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   num number = 0.0;
-  double max = 50;
   double min = 0.0;
-  double maxvalue = 100.0;
   double value = 0;
   var rnd = Random();
   List<num> lista = [];
+  List<num> toplist = [];
 
-  final myc1 = TextEditingController();
-  final myc2 = TextEditingController();
-  final myc3 = TextEditingController();
-
-  void calc() {
-    for (double i = min; i < max; i++) {
-      double half = 30;
-      number = pow((i / (max - (half + i))) * 2, 2);
-      lista.add(number);
-      print(number);
-    }
-    setState(() {});
-  }
+  final myc1 = TextEditingController(text: '1');
+  final myc2 = TextEditingController(text: '100');
+  final myc3 = TextEditingController(text: '1');
+  final myc4 = TextEditingController(text: '10');
 
   void randomgen(double inmin, double inmax) {
-    double sum = 0;
-    List<double> avglist = [];
-    for (int i = 0; i < int.parse(myc3.text); i++) {
-      avglist.add(doubleInRange(rnd, inmin, inmax));
+    for (int a = 0; a < 100; a++) {
+      double sum = 0;
+      List<double> avglist = [];
+      for (int i = 0; i < int.parse(myc3.text); i++) {
+        avglist.add(doubleInRange(rnd, inmin, inmax));
+      }
+      for (var i = 0; i < avglist.length; i++) {
+        sum += avglist[i];
+      }
+      value = sum / avglist.length;
+      lista.add(value);
     }
-    for (var i = 0; i < avglist.length; i++) {
-      sum += avglist[i];
-    }
-    value = sum / avglist.length;
-    lista.add(value);
+    toppos(lista);
     setState(() {});
   }
 
   double doubleInRange(Random source, num start, num end) {
     return start + (source.nextDouble() * (end - start));
+  }
+
+  void toppos(List value) {
+    double iter = 0;
+    List<int> ranges = List<int>.generate(
+        int.parse(myc4.text)+1, (i) => i = i * (int.parse(myc2.text) / int.parse(myc4.text)).round());
+    toplist.clear();
+    lista.sort();
+    toplist = List<int>.generate(value.length, (i) => i + 1);
+    for (int k = 0; k < ranges.length; k++) {
+      iter = 1;
+      for (int j = 0; j < toplist.length; j++) {
+        if (value[j] > ranges[k] && value[j] < ranges[k + 1]) {
+          iter++;
+          toplist[j] = iter;
+        }
+      }
+    }
   }
 
   @override
@@ -80,43 +91,59 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('$value'),
       ),
-      body: 
-      
-      Stack(children: [
-            for(int i = 0; i< lista.length; i++)
-            Positioned(
-                top: lista[i].toDouble()*2,
-                left: 100,
-                child: (Container(color: Colors.black, width: 10, height: 10))),
-          Column(
-        children: [
-          Row(children: [
-            Container(
+      body: Stack(children: [
+        for (int i = 0; i < lista.length; i++)
+          Positioned(
+              bottom: toplist[i].toDouble(),
+              left: lista[i].toDouble(),
+              child: (Container(color: Colors.black, width: 3, height: 3))),
+        Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+              const Text('Start: '),
+              Container(
+                  width: 50,
+                  child: TextField(
+                    controller: myc1,
+                  )),
+              const Text('End: '),
+              Container(
+                  padding: const EdgeInsets.all(10),
+                  width: 50,
+                  child: TextField(
+                    controller: myc2,
+                  )),
+              const Text('Weight: '),
+              Container(
+                  width: 50,
+                  child: TextField(
+                    controller: myc3,
+                  )),
+              const Text('Resolution: '),
+              Container(
+                  padding: const EdgeInsets.all(10),
+                  width: 50,
+                  child: TextField(
+                    controller: myc4,
+                  )),
+              ElevatedButton(
+                child: const Text('Delete'),
+                onPressed: () {
+                  setState(() {
+                    lista.clear();
+                  });
+                }),
+            ]),
             
-                width: 100,
-                child: TextField(
-                  controller: myc1,
-                )),
-            Container(
-              padding: EdgeInsets.all(10),
-                width: 100,
-                child: TextField(
-                  controller: myc2,
-                )),
-            Container(
-                width: 100,
-                child: TextField(
-                  controller: myc3,
-                ))
-          ]),
-          
-        ],
-      ),]),
-      
+          ],
+        ),
+      ]),
       floatingActionButton: FloatingActionButton(
         onPressed: () =>
             randomgen(double.parse(myc1.text), double.parse(myc2.text)),
-        tooltip: 'Increment',
+        tooltip: 'Generate',
         child: const Icon(Icons.add),
       ),
     );
