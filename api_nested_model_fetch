@@ -1,0 +1,213 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
+Future<List<User>> fetchUser() async {
+  final response =
+      await http.get(Uri.parse('https://jsonplaceholder.typicode.com/users'));
+
+  // If the server did return a 200 OK response,
+  // then parse the JSON.
+  var responseData = json.decode(response.body);
+
+  List<User> users = [];
+  for (var singleUser in responseData) {
+    User user = User(
+        id: singleUser["id"],
+        name: singleUser["name"],
+        username: singleUser["username"],
+        company: Company.fromJson(singleUser["company"]),
+        email: singleUser["email"]);
+
+    //Adding user to the list.
+    users.add(user);
+  }
+  return users;
+}
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<List<User>> futureUser;
+
+  @override
+  void initState() {
+    super.initState();
+    futureUser = fetchUser();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Fetch Data Example',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Fetch Data Example'),
+        ),
+        body: Center(
+          child: FutureBuilder<List<User>>(
+            future: futureUser,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      User inputuser = snapshot.data![index];
+                      return Text(
+                          '${inputuser.email!} Company: ${inputuser.company!.name}');
+                    });
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+
+              // By default, show a loading spinner.
+              return const CircularProgressIndicator();
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// To parse this JSON data, do
+//
+//     final user = userFromJson(jsonString);
+
+User userFromJson(String str) => User.fromJson(json.decode(str));
+
+String userToJson(User data) => json.encode(data.toJson());
+
+class User {
+  User({
+    required this.id,
+    required this.name,
+    required this.username,
+    this.email,
+    this.address,
+    this.phone,
+    this.website,
+    this.company,
+  });
+
+  int id;
+  String name;
+  String username;
+  String? email;
+  Address? address;
+  String? phone;
+  String? website;
+  Company? company;
+
+  factory User.fromJson(Map<String, dynamic> json) => User(
+        id: json["id"],
+        name: json["name"],
+        username: json["username"],
+        email: json["email"] == null ? null : json["email"],
+        address:
+            json["address"] == null ? null : Address.fromJson(json["address"]),
+        phone: json["phone"] == null ? null : json["phone"],
+        website: json["website"] == null ? null : json["website"],
+        company:
+            json["company"] == null ? null : Company.fromJson(json["company"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "username": username,
+        "email": email == null ? null : email,
+        "address": address == null ? null : address!.toJson(),
+        "phone": phone == null ? null : phone,
+        "website": website == null ? null : website,
+        "company": company == null ? null : company!.toJson(),
+      };
+}
+
+class Address {
+  Address({
+    required this.street,
+    required this.suite,
+    required this.city,
+    required this.zipcode,
+    required this.geo,
+  });
+
+  String street;
+  String suite;
+  String city;
+  String zipcode;
+  Geo geo;
+
+  factory Address.fromJson(Map<String, dynamic> json) => Address(
+        street: json["street"],
+        suite: json["suite"],
+        city: json["city"],
+        zipcode: json["zipcode"],
+        geo: Geo.fromJson(json["geo"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "street": street,
+        "suite": suite,
+        "city": city,
+        "zipcode": zipcode,
+        "geo": geo.toJson(),
+      };
+}
+
+class Geo {
+  Geo({
+    required this.lat,
+    required this.lng,
+  });
+
+  String lat;
+  String lng;
+
+  factory Geo.fromJson(Map<String, dynamic> json) => Geo(
+        lat: json["lat"],
+        lng: json["lng"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "lat": lat,
+        "lng": lng,
+      };
+}
+
+class Company {
+  Company({
+    required this.name,
+    required this.catchPhrase,
+    required this.bs,
+  });
+
+  String name;
+  String catchPhrase;
+  String bs;
+
+  factory Company.fromJson(Map<String, dynamic> json) => Company(
+        name: json["name"],
+        catchPhrase: json["catchPhrase"],
+        bs: json["bs"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "name": name,
+        "catchPhrase": catchPhrase,
+        "bs": bs,
+      };
+}
