@@ -12,16 +12,90 @@ Future<List<User>> fetchUser() async {
   // then parse the JSON.
   var responseData = json.decode(response.body);
 
-  List<User> users = [];
-  for (var singleUser in responseData) {
-    User user = User(
-        id: singleUser["id"],
-        name: singleUser["name"],
-        username: singleUser["username"],
-        company: Company.fromJson(singleUser["company"]),
-        email: singleUser["email"]);
+  var adat = [
+    {
+      "id": 1,
+      "name": "Leanne Graham",
+      "username": "Bret",
+      "email": "Sincere@april.biz",
+      "address": {
+        "street": "Kulas Light",
+        "suite": "Apt. 556",
+        "city": "Gwenborough",
+        "zipcode": "92998-3874",
+        "geo": {"lat": "-37.3159", "lng": "81.1496"}
+      },
+      "phone": "1-770-736-8031 x56442",
+      "website": "hildegard.org",
+      "company": [
+        {
+          "name": "Deckow-Crist11",
+          "catchPhrase": "Proactive didactic contingency",
+          "bs": "synergize scalable supply-chains"
+        },
+        {
+          "name": "Deckow-Crist12",
+          "catchPhrase": "Proactive didactic contingency",
+          "bs": "synergize scalable supply-chains"
+        },
+        {
+          "name": "Deckow-Crist13",
+          "catchPhrase": "Proactive didactic contingency",
+          "bs": "synergize scalable supply-chains"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Ervin Howell",
+      "username": "Antonette",
+      "email": "Shanna@melissa.tv",
+      "address": {
+        "street": "Victor Plains",
+        "suite": "Suite 879",
+        "city": "Wisokyburgh",
+        "zipcode": "90566-7771",
+        "geo": {"lat": "-43.9509", "lng": "-34.4618"}
+      },
+      "phone": "010-692-6593 x09125",
+      "website": "anastasia.net",
+      "company": [
+        {
+          "name": "Deckow-Crist21",
+          "catchPhrase": "Proactive didactic contingency",
+          "bs": "synergize scalable supply-chains"
+        },
+        {
+          "name": "Deckow-Crist22",
+          "catchPhrase": "Proactive didactic contingency",
+          "bs": "synergize scalable supply-chains"
+        },
+        {
+          "name": "Deckow-Crist23",
+          "catchPhrase": "Proactive didactic contingency",
+          "bs": "synergize scalable supply-chains"
+        }
+      ]
+    },
+  ];
 
-    //Adding user to the list.
+  List<User> users = [];
+  for (int i = 0; i < adat.length; i++) {
+    var singleUser = adat[i];
+
+    var list = singleUser['company'] as List;
+    List<Company> imagesList = list.map((i) => Company.fromJson(i)).toList();
+
+    User user = User(
+      id: singleUser['id'] != null ? int.parse(singleUser['id'].toString()) : 1,
+      name: singleUser['name'] != null ? singleUser['name'].toString() : '',
+      username: singleUser['username'] != null
+          ? singleUser['username'].toString()
+          : '',
+      company: imagesList,
+      email: singleUser['email'] != null ? singleUser['email'].toString() : '',
+    );
+
     users.add(user);
   }
   return users;
@@ -61,13 +135,35 @@ class _MyAppState extends State<MyApp> {
             future: futureUser,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      User inputuser = snapshot.data![index];
-                      return Text(
-                          '${inputuser.email!} Company: ${inputuser.company!.name}');
-                    });
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Expanded(
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            User inputuser = snapshot.data![index];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text('${inputuser.name}'),
+                                ListView.builder(
+                                    itemCount: inputuser.company!.length,
+                                    physics: ClampingScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemBuilder:
+                                        (BuildContext context, int ind) {
+                                      Company inputcompany =
+                                          inputuser.company![ind];
+                                      return Text('${inputcompany.name}');
+                                    }),
+                              ],
+                            );
+                          }),
+                    )
+                  ],
+                );
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
@@ -92,9 +188,9 @@ String userToJson(User data) => json.encode(data.toJson());
 
 class User {
   User({
-    required this.id,
-    required this.name,
-    required this.username,
+    this.id,
+    this.name,
+    this.username,
     this.email,
     this.address,
     this.phone,
@@ -102,14 +198,14 @@ class User {
     this.company,
   });
 
-  int id;
-  String name;
-  String username;
+  int? id;
+  String? name;
+  String? username;
   String? email;
   Address? address;
   String? phone;
   String? website;
-  Company? company;
+  List<Company>? company;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
         id: json["id"],
@@ -120,8 +216,10 @@ class User {
             json["address"] == null ? null : Address.fromJson(json["address"]),
         phone: json["phone"] == null ? null : json["phone"],
         website: json["website"] == null ? null : json["website"],
-        company:
-            json["company"] == null ? null : Company.fromJson(json["company"]),
+        company: json["company"] == null
+            ? null
+            : List<Company>.from(
+                json["company"].map((x) => Company.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -132,7 +230,9 @@ class User {
         "address": address == null ? null : address!.toJson(),
         "phone": phone == null ? null : phone,
         "website": website == null ? null : website,
-        "company": company == null ? null : company!.toJson(),
+        "company": company == null
+            ? null
+            : List<dynamic>.from(company!.map((x) => x.toJson())),
       };
 }
 
