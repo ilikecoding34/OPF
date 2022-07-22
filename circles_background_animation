@@ -45,7 +45,6 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Stack(children: [
           ...korok,
           MyStatefulWidget(onFinished: (val) {
-            
             setState(() {
               for (int i = 0; i < 20; i++) {
                 korok.add(MyStatefulWidget(onFinished: (val) => null));
@@ -71,17 +70,25 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   late final AnimationController _controller = AnimationController(
     duration: const Duration(seconds: 2),
     vsync: this,
-  )..forward().whenComplete(() {
-      widget.onFinished(true);
-    });
+  );
 
   late final Animation<Offset> _offsetAnimation = Tween<Offset>(
-    begin: Offset((rng.nextDouble() * 50), rng.nextDouble()-2),
+    begin: Offset((rng.nextDouble() * 50), rng.nextDouble() - 2),
     end: Offset((rng.nextDouble() * 50), rng.nextDouble() + 30),
   ).animate(CurvedAnimation(
     parent: _controller,
-    curve: Interval(rng.nextDouble(), 1.0, curve: Curves.linear),
+    curve: Curves.linear,
   ));
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: rng.nextInt(1000)*2), () {
+      _controller.forward().whenComplete(() {
+      widget.onFinished(true);
+    });
+    });
+  }
 
   @override
   void dispose() {
