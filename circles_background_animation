@@ -34,8 +34,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<MyStatefulWidget> korok = [];
-
+  List<Circle> circles = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,11 +42,11 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
         ),
         body: Stack(children: [
-          ...korok,
-          MyStatefulWidget(onFinished: (val) {
+          ...circles,
+          Circle(onFinished: (val) {
             setState(() {
-              for (int i = 0; i < 20; i++) {
-                korok.add(MyStatefulWidget(onFinished: (val) => null));
+              for (int i = 0; i < 50; i++) {
+                circles.add(const Circle());
               }
             });
           }),
@@ -55,26 +54,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class MyStatefulWidget extends StatefulWidget {
-  final Function(bool) onFinished;
-  const MyStatefulWidget({Key? key, required this.onFinished})
-      : super(key: key);
+class Circle extends StatefulWidget {
+  final Function(bool)? onFinished;
+  const Circle({Key? key, this.onFinished}) : super(key: key);
 
   @override
-  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+  State<Circle> createState() => _CircleState();
 }
 
-class _MyStatefulWidgetState extends State<MyStatefulWidget>
-    with SingleTickerProviderStateMixin {
+class _CircleState extends State<Circle> with SingleTickerProviderStateMixin {
   var rng = Random();
+  var rngsize = Random();
+  double left = 0.0;
+  double size = 0.0;
+  bool visible = false;
   late final AnimationController _controller = AnimationController(
     duration: const Duration(seconds: 2),
     vsync: this,
   );
 
   late final Animation<Offset> _offsetAnimation = Tween<Offset>(
-    begin: Offset((rng.nextDouble() * 50), rng.nextDouble() - 2),
-    end: Offset((rng.nextDouble() * 50), rng.nextDouble() + 30),
+    begin: Offset(left, 100),
+    end: Offset(left, 0),
   ).animate(CurvedAnimation(
     parent: _controller,
     curve: Curves.linear,
@@ -83,10 +84,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: rng.nextInt(1000)*2), () {
+    left = rng.nextDouble() * 200;
+    size = rngsize.nextDouble() * 10;
+    Future.delayed(Duration(milliseconds: rng.nextInt(1000) * 5), () {
+      setState(() {
+        visible = true;
+      });
       _controller.forward().whenComplete(() {
-      widget.onFinished(true);
-    });
+        if (widget.onFinished != null) {
+          widget.onFinished!(true);
+        }
+        setState(() {
+          visible = false;
+        });
+      });
     });
   }
 
@@ -98,12 +109,24 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
 
   @override
   Widget build(BuildContext context) {
-    return SlideTransition(
-      position: _offsetAnimation,
-      child: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Icon(Icons.circle, size: 10.0),
-      ),
-    );
+    return Visibility(
+        child: SlideTransition(
+          position: _offsetAnimation,
+          child: Container(
+            width: size == null ? 10 : size,
+            height: size == null ? 10 : size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blue,
+                  blurRadius: size == null ? 10 : size,
+                  spreadRadius: size == null ? 10 : size,
+                ),
+              ],
+            ),
+          ),
+        ),
+        visible: visible);
   }
 }
