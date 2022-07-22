@@ -34,25 +34,32 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
- 
+  List<MyStatefulWidget> korok = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Stack(children:[
-        MyStatefulWidget(onFinished:(val){
-        print(val);
-      }),])
-      
-    );
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: Stack(children: [
+          ...korok,
+          MyStatefulWidget(onFinished: (val) {
+            
+            setState(() {
+              for (int i = 0; i < 20; i++) {
+                korok.add(MyStatefulWidget(onFinished: (val) => null));
+              }
+            });
+          }),
+        ]));
   }
 }
 
 class MyStatefulWidget extends StatefulWidget {
   final Function(bool) onFinished;
-  const MyStatefulWidget({Key? key, required this.onFinished}) : super(key: key);
+  const MyStatefulWidget({Key? key, required this.onFinished})
+      : super(key: key);
 
   @override
   State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
@@ -64,13 +71,13 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   late final AnimationController _controller = AnimationController(
     duration: const Duration(seconds: 2),
     vsync: this,
-  )..forward().whenComplete((){
-    widget.onFinished(true);
-  });
-  
+  )..forward().whenComplete(() {
+      widget.onFinished(true);
+    });
+
   late final Animation<Offset> _offsetAnimation = Tween<Offset>(
-    begin: Offset((rng.nextDouble()*10), rng.nextDouble()),
-    end: Offset((rng.nextDouble()*10)+100, rng.nextDouble()+2),
+    begin: Offset((rng.nextDouble() * 50), rng.nextDouble()-2),
+    end: Offset((rng.nextDouble() * 50), rng.nextDouble() + 30),
   ).animate(CurvedAnimation(
     parent: _controller,
     curve: Interval(rng.nextDouble(), 1.0, curve: Curves.linear),
@@ -93,4 +100,3 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
     );
   }
 }
-
