@@ -1,0 +1,96 @@
+// Copyright (c) 2019, the Dart project authors.  Please see the AUTHORS file
+// for details. All rights reserved. Use of this source code is governed by a
+// BSD-style license that can be found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  final String title;
+
+  const MyHomePage({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+ 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Stack(children:[
+        MyStatefulWidget(onFinished:(val){
+        print(val);
+      }),])
+      
+    );
+  }
+}
+
+class MyStatefulWidget extends StatefulWidget {
+  final Function(bool) onFinished;
+  const MyStatefulWidget({Key? key, required this.onFinished}) : super(key: key);
+
+  @override
+  State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
+}
+
+class _MyStatefulWidgetState extends State<MyStatefulWidget>
+    with SingleTickerProviderStateMixin {
+  var rng = Random();
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(seconds: 2),
+    vsync: this,
+  )..forward().whenComplete((){
+    widget.onFinished(true);
+  });
+  
+  late final Animation<Offset> _offsetAnimation = Tween<Offset>(
+    begin: Offset((rng.nextDouble()*10), rng.nextDouble()),
+    end: Offset((rng.nextDouble()*10)+100, rng.nextDouble()+2),
+  ).animate(CurvedAnimation(
+    parent: _controller,
+    curve: Interval(rng.nextDouble(), 1.0, curve: Curves.linear),
+  ));
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SlideTransition(
+      position: _offsetAnimation,
+      child: const Padding(
+        padding: EdgeInsets.all(8.0),
+        child: Icon(Icons.circle, size: 10.0),
+      ),
+    );
+  }
+}
+
