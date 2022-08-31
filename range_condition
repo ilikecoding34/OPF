@@ -1,0 +1,40 @@
+// Copyright 2015 the Dart project authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license
+// that can be found in the LICENSE file.
+
+void main() {
+  Range range = Range();
+  range.min = 2;
+  range.max = 4;
+  for (var i = 0; i <= 5; i++) {
+    range.value = i;
+    print('${range.inRange()} - ${range.outRange()}');
+  }
+  
+}
+
+class Range{
+  int _min = 0;
+  int _max = 0;
+  int _value = 0;
+  set min(int val) => _min = val;
+  set max(int val) => _max = val;
+  set value(int val) => _value = val;
+  
+  inRange(){
+    if(_value >= _min && _value <= _max){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  
+  outRange(){
+    if(_value >= _min && _value <= _max){
+      return false;
+    }else{
+      return true;
+    }
+  }
+  
+}
