@@ -11,13 +11,26 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: _title,
-      home: MyStatefulWidget(),
+      home: MyStatefulWidget(
+          borderwidth: 10.0, linewidth: 50, boxradius: 10, boxwidth: 250, boxheight: 400),
     );
   }
 }
 
 class MyStatefulWidget extends StatefulWidget {
-  const MyStatefulWidget({super.key});
+  const MyStatefulWidget(
+      {super.key,
+      required this.borderwidth,
+      required this.linewidth,
+      required this.boxradius,
+      required this.boxwidth,
+      required this.boxheight});
+
+  final double borderwidth;
+  final double boxwidth;
+  final double boxradius;
+  final double boxheight;
+  final double linewidth;
 
   @override
   State<MyStatefulWidget> createState() => _MyStatefulWidgetState();
@@ -43,80 +56,74 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
 
   @override
   Widget build(BuildContext context) {
+    double linesize = widget.boxheight >= widget.boxwidth
+        ? widget.boxheight
+        : widget.boxwidth;
     return Scaffold(
-        body: Center(
-            child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Container(
-                            width: 200,
-                            height: 200,
-                            child: Stack(children: [
-                              Positioned(
-                                top: 0,
-                                left: 0,
-                                child: Container(
-                                  color: Colors.blue,
-                                  width: 200,
-                                  height: 200,
-                                ),
-                              ),
-                              Positioned(
-                                top: 20,
-                                left: -100,
-                                child: Container(
-                                  width: 400,
-                                  height: 160,
-                                  child: RotationTransition(
-                                    turns: _animation,
-                                    child: Stack(children: [
-                                      Positioned(
-                                          top: 0,
-                                          left: 0,
-                                          child: Container(
-                                              width: 200,
-                                              height: 80,
-                                              decoration: const BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.transparent,
-                                                  Colors.black
-                                                ],
-                                                begin: Alignment.bottomLeft,
-                                                end: Alignment.topLeft,
-                                              )))),
-                                      Positioned(
-                                          top: 80,
-                                          left: 200,
-                                          child: Container(
-                                              width: 200,
-                                              height: 80,
-                                              decoration: const BoxDecoration(
-                                                  gradient: LinearGradient(
-                                                colors: [
-                                                  Colors.transparent,
-                                                  Colors.black
-                                                ],
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomLeft,
-                                              )))),
-                                    ]),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: 5,
-                                left: 5,
-                                child: Container(
-                                  width: 190,
-                                  height: 190,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ),
-                            ]))))));
+        body: ClipRRect(
+            borderRadius: BorderRadius.circular(widget.boxradius),
+            child: Container(
+                width: widget.boxwidth,
+                height: widget.boxheight,
+                child: Stack(children: [
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Container(
+                      color: Colors.blue,
+                      width: widget.boxwidth,
+                      height: widget.boxheight,
+                    ),
+                  ),
+                  Positioned(
+                    top: (widget.boxheight - (widget.linewidth * 2)) / 2,
+                    left: -linesize + (widget.boxwidth / 2),
+                    child: Container(
+                      width: linesize * 2,
+                      height: widget.linewidth * 2,
+                      child: RotationTransition(
+                        turns: _animation,
+                        child: Stack(children: [
+                          Positioned(
+                              top: 0,
+                              left: 0,
+                              child: Container(
+                                  width: linesize,
+                                  height: widget.linewidth,
+                                  decoration: const BoxDecoration(
+                                      gradient: LinearGradient(
+                                    colors: [Colors.transparent, Colors.black],
+                                    begin: Alignment.bottomLeft,
+                                    end: Alignment.topLeft,
+                                  )))),
+                          Positioned(
+                              top: widget.linewidth,
+                              left: linesize,
+                              child: Container(
+                                  width: linesize,
+                                  height: widget.linewidth,
+                                  decoration: const BoxDecoration(
+                                      gradient: LinearGradient(
+                                    colors: [Colors.transparent, Colors.black],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomLeft,
+                                  )))),
+                        ]),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: (widget.borderwidth / 2)-1,
+                    left: (widget.borderwidth / 2)-1,
+                    child: Container(
+                      width: widget.boxwidth - widget.borderwidth,
+                      height: widget.boxheight - widget.borderwidth,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(widget.boxradius),
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                ]))));
   }
 }
