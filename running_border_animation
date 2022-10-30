@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 void main() => runApp(const MyApp());
 
@@ -12,7 +13,11 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       title: _title,
       home: MyStatefulWidget(
-          borderwidth: 10.0, linewidth: 50, boxradius: 10, boxwidth: 250, boxheight: 400),
+          borderwidth: 10.0,
+          linewidth: 50,
+          boxradius: 10,
+          boxwidth: 400,
+          boxheight: 100),
     );
   }
 }
@@ -57,8 +62,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   @override
   Widget build(BuildContext context) {
     double linesize = widget.boxheight >= widget.boxwidth
-        ? widget.boxheight
-        : widget.boxwidth;
+        ? widget.boxheight * 1.4
+        : widget.boxwidth * 1.4;
     return Scaffold(
         body: ClipRRect(
             borderRadius: BorderRadius.circular(widget.boxradius),
@@ -76,45 +81,59 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
                     ),
                   ),
                   Positioned(
-                    top: (widget.boxheight - (widget.linewidth * 2)) / 2,
-                    left: -linesize + (widget.boxwidth / 2),
+                    top: (widget.boxheight - linesize) / 2,
+                    left: (widget.boxwidth - linesize) / 2,
                     child: Container(
-                      width: linesize * 2,
-                      height: widget.linewidth * 2,
+                      width: linesize,
+                      height: linesize,
                       child: RotationTransition(
                         turns: _animation,
                         child: Stack(children: [
-                          Positioned(
-                              top: 0,
-                              left: 0,
+                          Container(
+                            width: linesize,
+                            height: linesize,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              gradient: const SweepGradient(
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.transparent,
+                                  Colors.black,
+                                ],
+                                stops: <double>[0.0, 0.25, 0.5, 0.75, 1.0],
+                                tileMode: TileMode.clamp,
+                              ),
+                            ),
+                          ),
+                          Transform.rotate(
+                              angle: -math.pi,
                               child: Container(
-                                  width: linesize,
-                                  height: widget.linewidth,
-                                  decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                    colors: [Colors.transparent, Colors.black],
-                                    begin: Alignment.bottomLeft,
-                                    end: Alignment.topLeft,
-                                  )))),
-                          Positioned(
-                              top: widget.linewidth,
-                              left: linesize,
-                              child: Container(
-                                  width: linesize,
-                                  height: widget.linewidth,
-                                  decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                    colors: [Colors.transparent, Colors.black],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomLeft,
-                                  )))),
+                                width: linesize,
+                                height: linesize,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  gradient: const SweepGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      Colors.transparent,
+                                      Colors.transparent,
+                                      Colors.transparent,
+                                      Colors.black,
+                                    ],
+                                    stops: <double>[0.0, 0.25, 0.5, 0.75, 1.0],
+                                    tileMode: TileMode.clamp,
+                                  ),
+                                ),
+                              ))
                         ]),
                       ),
                     ),
                   ),
                   Positioned(
-                    top: (widget.borderwidth / 2)-1,
-                    left: (widget.borderwidth / 2)-1,
+                    top: (widget.borderwidth / 2) - 1,
+                    left: (widget.borderwidth / 2) - 1,
                     child: Container(
                       width: widget.boxwidth - widget.borderwidth,
                       height: widget.boxheight - widget.borderwidth,
