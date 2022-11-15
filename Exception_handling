@@ -1,0 +1,32 @@
+class EmptyNameException implements Exception {
+  String cause = '';
+  EmptyNameException(this.cause);
+}
+
+class ShortNameException implements Exception {
+  String cause = '';
+  ShortNameException(this.cause);
+}
+
+void displayName(str, minlength) {
+  if (str.length >= minlength) {
+    print(str);
+  } else if(str.length > 0 && str.length < minlength){
+    throw ShortNameException('Too short name. Minimum is: $minlength');
+  } else {
+    throw EmptyNameException('Name is empty.');
+  }
+}
+
+void main() {
+  String name = '';
+  int length = 6;
+  try {
+    displayName(name, length);
+  } on ShortNameException catch(e){
+    print('Exception details:\n ${e.cause}');
+  } on EmptyNameException catch(e){
+    print('Exception details:\n ${e.cause}');
+  }
+  print('Bye');
+}
